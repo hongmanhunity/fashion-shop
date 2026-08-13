@@ -1,0 +1,22 @@
+const express = require("express");
+const connectDatabase = require("./config/dbConnect");
+const initRouter = require("./routers");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
+
+const app = express();
+const port = process.env.PORT || 3000;
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+connectDatabase();
+initRouter(app);
+//Config server
+app.get("/", (req, res) => {
+  res.send("🚀 Server E-commerce is running...");
+});
+
+app.listen(port, () => {
+  console.log(`✅ Server đang chạy mượt mà tại http://localhost:${port}`);
+});
