@@ -260,11 +260,6 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  // ... các hàm cũ
-  updateUserByAdmin,
-};
-
-module.exports = {
   register,
   login,
   getCurrent,
