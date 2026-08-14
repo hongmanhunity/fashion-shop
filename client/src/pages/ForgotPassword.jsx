@@ -27,9 +27,10 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex justify-center pt-16 pb-24">
+    <div className="flex justify-center pt-8 pb-24">
       <div className="w-full max-w-[440px] px-6">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 flex flex-col items-center">
+          <img src="/Lumiere.png" alt="Lumière Logo" className="-mt-2 h-12 w-auto mb-8 object-contain" />
           <h2 className="font-heading text-4xl font-normal text-text-main mb-4 tracking-wide uppercase">Khôi phục mật khẩu</h2>
           <p className="text-text-muted text-sm tracking-wider uppercase">Lumière Việt Nam</p>
         </div>
@@ -69,7 +70,7 @@ const ForgotPassword = () => {
           </button>
         </form>
 
-        <div className="mt-10 pt-8 border-t border-[#EAEAEA] text-center">
+        <div className="mt-6 pt-6 border-t border-[#EAEAEA] text-center">
           <Link to="/login" className="text-sm text-text-muted hover:text-text-main transition-colors underline underline-offset-4 uppercase tracking-widest">
             Trở lại đăng nhập
           </Link>

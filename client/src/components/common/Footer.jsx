@@ -3,7 +3,10 @@ const Footer = () => {
     <footer className="bg-accent pt-12 border-t border-border">
       <div className="container-custom flex justify-between flex-wrap gap-8 mb-12">
         <div className="max-w-[300px]">
-          <h2 className="font-heading text-4xl text-text-main mb-4">Lumière</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <img src="/Lumiere.png" alt="Lumière Logo" className="h-8 object-contain" />
+            <h2 className="font-heading text-4xl text-primary font-bold">Lumière</h2>
+          </div>
           <p className="text-text-muted leading-relaxed">
             Thời trang nữ cao cấp, tôn vinh vẻ đẹp hiện đại và thanh lịch của phái đẹp.
           </p>

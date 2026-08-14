@@ -25,7 +25,10 @@ const Header = () => {
     <header className="bg-white/85 backdrop-blur-md sticky top-0 z-50 border-b border-border">
       <div className="container-custom grid grid-cols-3 items-center h-20">
         <div className="font-heading text-3xl font-bold text-primary tracking-wide flex justify-start">
-          <Link to="/">Lumière</Link>
+          <Link to="/" className="flex items-center gap-2">
+            <img src="/Lumiere.png" alt="Lumière Logo" className="h-8 object-contain" />
+            Lumière
+          </Link>
         </div>
         
         <nav className="flex gap-8 justify-center">

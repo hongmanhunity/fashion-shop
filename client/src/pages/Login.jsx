@@ -33,9 +33,10 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center pt-16 pb-24">
+    <div className="flex justify-center pt-8 pb-24">
       <div className="w-full max-w-[440px] px-6">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 flex flex-col items-center">
+          <img src="/Lumiere.png" alt="Lumière Logo" className="-mt-2 h-12 w-auto mb-8 object-contain" />
           <h2 className="font-heading text-4xl font-normal text-text-main mb-4 tracking-wide uppercase">Đăng nhập</h2>
           <p className="text-text-muted text-sm tracking-wider uppercase">Lumière Việt Nam</p>
         </div>
@@ -85,7 +86,7 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="mt-10 pt-8 border-t border-[#EAEAEA] text-center">
+        <div className="mt-6 pt-6 border-t border-[#EAEAEA] text-center">
           <p className="text-sm text-text-muted mb-4">Bạn chưa có tài khoản?</p>
           <Link to="/register" className="inline-block w-full border border-text-main text-text-main py-4 text-sm uppercase tracking-[0.2em] hover:bg-background transition-colors text-center">
             Tạo tài khoản mới
