@@ -8,10 +8,6 @@ const crypto = require("crypto");
 
 const register = asyncHandler(async (req, res) => {
   const { email, password, firstname, lastname, mobile } = req.body;
-  //Xu ly brcypt tai Controller
-  //   const salt = brcypt.genSaltSync(10);
-  //   const hashedPassword = brcypt.hashSync(password, salt);
-  //   const newUser = { ...req.body, password: hashedPassword };
   //Validate
   if (!email || !password || !lastname || !firstname || !mobile) {
     return res.status(400).json({
@@ -150,7 +146,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   await rs_user.save();
   // Cấu trúc nội dung Email
   const html = `Xin vui lòng click vào link dưới đây để thay đổi mật khẩu của bạn. Link này sẽ hết hạn sau 15 phút. 
-  <a href="${process.env.URL_SERVER}/api/user/reset-password/${resetToken}">Nhấn vào đây để đổi mật khẩu</a>`;
+  <a href="${process.env.URL_CLIENT}/reset-password/${resetToken}">Nhấn vào đây để đổi mật khẩu</a>`;
 
   const data = { email, html };
 

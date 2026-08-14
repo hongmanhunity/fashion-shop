@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const connectDatabase = require("./config/dbConnect");
 const initRouter = require("./routers");
 const cookieParser = require("cookie-parser");
@@ -6,6 +7,10 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

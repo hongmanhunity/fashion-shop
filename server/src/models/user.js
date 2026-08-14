@@ -24,16 +24,15 @@ var userSchema = new mongoose.Schema(
   },
 );
 // Hash password trước khi lưu
-userSchema.pre("save", function (next) {
+userSchema.pre("save", async function () {
   // Nếu password không bị thay đổi thì bỏ qua
   if (!this.isModified("password")) {
-    return next();
+    return;
   }
 
-  // Dùng sync để đảm bảo hook chạy xong không bị lỡ nhịp Promise
-  const salt = bcrypt.genSaltSync(10);
-  this.password = bcrypt.hashSync(this.password, salt);
-  next();
+  // Chuyển sang dùng async/await để mã hóa
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 userSchema.methods = {

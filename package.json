@@ -1,29 +1,17 @@
 {
-  "name": "E-Commerce",
+  "name": "e-commerce-monorepo",
   "version": "1.0.0",
-  "main": "src/server.js",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "express-async-handler": "^1.2.0",
-    "express-validator": "^7.3.2",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.9.2",
-    "nodemailer": "^9.0.5",
-    "slugify": "^1.6.9"
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "install-all": "npm install"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "concurrently": "^8.2.2"
   }
 }
