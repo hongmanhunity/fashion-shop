@@ -1,99 +1,178 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, MagnifyingGlass, SignOut } from '@phosphor-icons/react';
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  ShoppingBag,
+  User,
+  MagnifyingGlass,
+  SignOut,
+} from "@phosphor-icons/react";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
+    const userStr = localStorage.getItem("userData");
+
     if (token) {
       setIsLoggedIn(true);
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          setUserName(`${user.firstname} ${user.lastname}`);
+        } catch (error) {
+          console.error("Lỗi khi đọc dữ liệu user", error);
+        }
+      }
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    setIsLoggedIn(false);
-    setShowDropdown(false);
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      // Gọi API Logout tới backend để xóa refreshToken trong DB và Cookie
+      await axios.post(
+        "http://localhost:3000/api/user/logout",
+        {},
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error("Lỗi khi gọi API logout:", error);
+    } finally {
+      // Xóa thông tin xác thực ở LocalStorage và reset state
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userData");
+      setIsLoggedIn(false);
+      setUserName("");
+      setShowDropdown(false);
+      navigate("/login");
+    }
   };
 
   return (
     <header className="bg-white/85 backdrop-blur-md sticky top-0 z-50 border-b border-border">
-      <div className="container-custom grid grid-cols-3 items-center h-20">
-        <div className="font-heading text-3xl font-bold text-primary tracking-wide flex justify-start">
+      {/* ĐÃ THAY ĐỔI: Bỏ container-custom, dùng w-full và px-8 lg:px-12 để tràn viền */}
+      <div className="w-full px-6 lg:px-12 flex justify-between items-center h-20 relative">
+        {/* Vùng 1: Logo (Tự động bám sát lề trái màn hình) */}
+        <div className="font-heading text-3xl font-bold text-primary tracking-wide">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/Lumiere.png" alt="Lumière Logo" className="h-8 object-contain" />
-            Lumière
+            <img
+              src="/Lumiere.png"
+              alt="Lumière Logo"
+              className="h-8 object-contain"
+            />
+            <span className="hidden sm:block">Lumière</span>
           </Link>
         </div>
-        
-        <nav className="flex gap-8 justify-center">
-          <Link to="/" className="text-[15px] font-medium text-text-main uppercase tracking-wider transition-colors hover:text-primary">Trang chủ</Link>
-          <Link to="/products" className="text-[15px] font-medium text-text-main uppercase tracking-wider transition-colors hover:text-primary">Sản phẩm</Link>
-          <Link to="/about" className="text-[15px] font-medium text-text-main uppercase tracking-wider transition-colors hover:text-primary">Về chúng tôi</Link>
+
+        {/* Vùng 2: Navigation (Luôn nằm ở chính giữa màn hình) */}
+        <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-8">
+          <Link
+            to="/"
+            className="text-[15px] font-medium text-text-main uppercase tracking-wider transition-colors hover:text-primary"
+          >
+            Trang chủ
+          </Link>
+          <Link
+            to="/products"
+            className="text-[15px] font-medium text-text-main uppercase tracking-wider transition-colors hover:text-primary"
+          >
+            Sản phẩm
+          </Link>
+          <Link
+            to="/about"
+            className="text-[15px] font-medium text-text-main uppercase tracking-wider transition-colors hover:text-primary"
+          >
+            Về chúng tôi
+          </Link>
         </nav>
-        
-        <div className="flex gap-6 items-center justify-end">
-          <button className="text-text-main hover:text-primary transition-colors flex items-center justify-center relative">
+
+        {/* Vùng 3: Icons & Actions (Tự động bám sát lề phải màn hình) */}
+        <div className="flex gap-4 items-center">
+          {/* Nút Tìm kiếm */}
+          <button className="text-text-main hover:text-primary transition-colors flex items-center justify-center p-1">
             <MagnifyingGlass size={24} weight="regular" />
           </button>
-          
-          {/* User Icon with Dropdown */}
-          <div className="relative">
-            {isLoggedIn ? (
-              <button 
-                className="text-text-main hover:text-primary transition-colors flex items-center justify-center relative focus:outline-none"
-                onClick={() => setShowDropdown(!showDropdown)}
-                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-              >
-                <User size={24} weight="fill" className="text-primary" />
-              </button>
-            ) : (
-              <Link to="/login" className="text-text-main hover:text-primary transition-colors flex items-center justify-center relative">
-                <User size={24} weight="regular" />
-              </Link>
-            )}
 
-            {/* Dropdown Menu */}
-            {isLoggedIn && showDropdown && (
-              <div className="absolute right-0 mt-4 w-48 bg-white border border-border rounded-xl shadow-float overflow-hidden z-50 animate-fade-in">
-                <div className="px-4 py-3 border-b border-border bg-accent/30">
-                  <p className="text-sm font-semibold text-text-main">Tài khoản của tôi</p>
-                </div>
-                <ul className="py-2">
-                  <li>
-                    <Link to="/profile" className="block px-4 py-2 text-sm text-text-muted hover:bg-background hover:text-primary transition-colors">
-                      Thông tin cá nhân
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/orders" className="block px-4 py-2 text-sm text-text-muted hover:bg-background hover:text-primary transition-colors">
-                      Đơn hàng
-                    </Link>
-                  </li>
-                  <li className="border-t border-border mt-2 pt-2">
-                    <button 
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-error hover:bg-error/5 transition-colors flex items-center gap-2"
-                    >
-                      <SignOut size={16} /> Đăng xuất
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-
-          <button className="text-text-main hover:text-primary transition-colors flex items-center justify-center relative">
+          {/* Nút Giỏ hàng */}
+          <button className="text-text-main hover:text-primary transition-colors flex items-center justify-center relative p-1">
             <ShoppingBag size={24} weight="regular" />
-            <span className="absolute -top-1 -right-1.5 bg-primary text-white text-[10px] font-bold h-4 min-w-[16px] rounded-full flex items-center justify-center px-1">
+            <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[10px] font-bold h-4 min-w-[16px] rounded-full flex items-center justify-center px-1">
               2
             </span>
           </button>
+
+          {/* Cụm User */}
+          <div className="flex items-center gap-2 ">
+            {isLoggedIn ? (
+              <>
+                {/* Vùng Icon User */}
+                <div className="relative">
+                  <button
+                    className="text-text-main hover:text-primary transition-colors flex items-center justify-center p-1 focus:outline-none"
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                  >
+                    <User size={24} weight="fill" className="text-primary" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showDropdown && (
+                    <div className="absolute right-0 mt-4 w-48 bg-white border border-border rounded-xl shadow-float overflow-hidden z-50 animate-fade-in">
+                      <div className="px-4 py-3 border-b border-border bg-accent/30">
+                        <p className="text-sm font-semibold text-text-main truncate">
+                          Tài khoản của tôi
+                        </p>
+                      </div>
+                      <ul className="py-2">
+                        <li>
+                          <Link
+                            to="/profile"
+                            className="block px-4 py-2 text-sm text-text-muted hover:bg-background hover:text-primary transition-colors"
+                          >
+                            Thông tin cá nhân
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/orders"
+                            className="block px-4 py-2 text-sm text-text-muted hover:bg-background hover:text-primary transition-colors"
+                          >
+                            Đơn hàng
+                          </Link>
+                        </li>
+                        <li className="border-t border-border mt-2 pt-2">
+                          <button
+                            onClick={handleLogout}
+                            className="w-full text-left px-4 py-2 text-sm text-error hover:bg-error/5 transition-colors flex items-center gap-2"
+                          >
+                            <SignOut size={16} /> Đăng xuất
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tên user */}
+                {userName && (
+                  <span className="text-sm font-medium text-text-main whitespace-nowrap hidden sm:block">
+                    Xin chào, {userName}!
+                  </span>
+                )}
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="text-text-main hover:text-primary transition-colors flex items-center justify-center p-1"
+              >
+                <User size={24} weight="regular" />
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </header>

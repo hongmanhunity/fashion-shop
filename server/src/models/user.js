@@ -11,7 +11,11 @@ var userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     role: { type: String, default: "user" },
     cart: { type: Array, default: [] },
-    address: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
+    address: { type: String, default: "" },
+    avatar: { 
+      type: String, 
+      default: "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg" 
+    },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     isBlocked: { type: Boolean, default: false },
     refreshToken: { type: String },

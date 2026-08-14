@@ -20,9 +20,14 @@ const Login = () => {
     setError('');
     
     try {
-      const response = await axios.post('http://localhost:3000/api/user/login', formData);
+      const response = await axios.post(
+        'http://localhost:3000/api/user/login', 
+        formData,
+        { withCredentials: true }
+      );
       if (response.data && response.data.success) {
         localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('userData', JSON.stringify(response.data.userData))
         window.location.href = '/';
       }
     } catch (err) {

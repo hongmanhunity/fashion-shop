@@ -1,29 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Star } from '@phosphor-icons/react';
+import RatingForm from '../components/product/RatingForm';
+import RatingList from '../components/product/RatingList';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3000/api/product/${id}`);
-        if (response.data && response.data.success) {
-          setProduct(response.data.productData);
-        }
-      } catch (error) {
-        console.error('Error fetching product:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
 
-    fetchProduct();
+  const fetchProduct = useCallback(async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/product/${id}`);
+      if (response.data && response.data.success) {
+        setProduct(response.data.productData);
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
 
   if (loading) return <div className="container-custom text-center py-16 text-lg text-text-muted">Đang tải thông tin...</div>;
   if (!product) return <div className="container-custom text-center py-16 text-lg text-text-muted">Không tìm thấy sản phẩm!</div>;
@@ -33,10 +37,14 @@ const ProductDetail = () => {
     currency: 'VND'
   }).format(product.price);
 
+  const avgRating = product.totalRatings || 0;
+  const ratingCount = product.ratings ? product.ratings.length : 0;
+
   return (
     <div className="container-custom py-8">
+      {/* Product Main Detail */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
-        {/* Images */}
+        {/* Product Images */}
         <div className="w-full rounded-2xl overflow-hidden bg-[#F5F5F5]">
           <img 
             src={product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/600x800?text=Lumiere'} 
@@ -45,20 +53,27 @@ const ProductDetail = () => {
           />
         </div>
 
-        {/* Info */}
+        {/* Product Information */}
         <div className="flex flex-col gap-6">
           <div className="text-sm text-text-muted uppercase tracking-[2px]">{product.brand}</div>
           <h1 className="text-4xl font-heading leading-tight m-0">{product.title}</h1>
           <div className="text-3xl font-semibold text-primary">{formattedPrice}</div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div className="flex text-[#FFC107]">
               {[1, 2, 3, 4, 5].map((star) => (
-                <Star key={star} weight="fill" size={20} />
+                <Star 
+                  key={star} 
+                  weight={star <= Math.round(avgRating) ? "fill" : "regular"} 
+                  size={20} 
+                />
               ))}
             </div>
+            <span className="text-sm font-medium text-text-main">
+              {avgRating > 0 ? `${avgRating} / 5` : 'Chưa có điểm'}
+            </span>
             <span className="text-sm text-text-muted">
-              {product.ratings ? product.ratings.length : 0} đánh giá
+              ({ratingCount} đánh giá)
             </span>
           </div>
 
@@ -83,29 +98,18 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Reviews Section */}
-      <div className="mt-16 pt-12 border-t border-border">
-        <h2 className="text-3xl font-heading mb-8">Đánh giá từ khách hàng</h2>
-        {product.ratings && product.ratings.length > 0 ? (
-          <div className="flex flex-col gap-6">
-            {product.ratings.map((rating, index) => (
-              <div key={index} className="bg-surface p-6 rounded-xl border border-border">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="flex text-[#FFC107]">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} weight={i < rating.star ? "fill" : "regular"} size={18} />
-                    ))}
-                  </div>
-                  <span className="font-semibold text-text-main">Khách hàng</span>
-                </div>
-                <p className="text-text-muted leading-relaxed">{rating.comment}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-text-muted italic">Chưa có đánh giá nào cho sản phẩm này.</p>
-        )}
-      </div>
+      {/* Review Section Components */}
+      <RatingForm 
+        productId={product._id} 
+        isLoggedIn={isLoggedIn} 
+        onRatingSuccess={fetchProduct} 
+      />
+
+      <RatingList 
+        ratings={product.ratings} 
+        avgRating={avgRating} 
+        ratingCount={ratingCount} 
+      />
     </div>
   );
 };

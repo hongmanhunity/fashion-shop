@@ -29,7 +29,10 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const product = await Product.findById(id);
+  const product = await Product.findById(id).populate({
+    path: "ratings.postedBy",
+    select: "firstname lastname email avatar",
+  });
   return res.status(200).json({
     success: product ? true : false,
     productData: product
@@ -85,19 +88,14 @@ const ratings = asyncHandler(async (req, res) => {
     throw new Error("Missing inputs - Thiếu số sao hoặc ID sản phẩm");
 
   // 💡 ĐIỂM SÁNG PHÒNG THỦ: Kiểm tra pid có phải định dạng ObjectId hợp lệ không
-  // Rất nhiều trường hợp Frontend gửi lên 1 chuỗi linh tinh làm app bị crash khi query
   if (!mongoose.Types.ObjectId.isValid(pid)) {
     return res
       .status(400)
       .json({ success: false, message: "Invalid product ID" });
   }
 
-  // Chuyển đổi an toàn sang dạng ObjectId để so sánh chuẩn xác
-  const userId = mongoose.Types.ObjectId(_id);
-  const productId = mongoose.Types.ObjectId(pid);
-
   // Lấy sản phẩm lên để thao tác
-  const ratingProduct = await Product.findById(productId);
+  const ratingProduct = await Product.findById(pid);
   if (!ratingProduct) {
     return res
       .status(404)
@@ -105,30 +103,37 @@ const ratings = asyncHandler(async (req, res) => {
   }
 
   // 3. LOGIC CỐT LÕI: Kiểm tra xem user này đã từng rate sản phẩm này chưa?
-  // Tìm trong mảng ratings xem có cái object nào mà postedBy trùng với ID của thằng đang gửi request không
   const alreadyRatingIndex = ratingProduct.ratings.findIndex(
-    (el) => el.postedBy.toString() === userId.toString(),
+    (el) => el.postedBy.toString() === _id.toString(),
   );
 
   if (alreadyRatingIndex !== -1) {
     // TRƯỜNG HỢP 1: Đã đánh giá rồi -> CẬP NHẬT LẠI
-    // Tìm thấy vị trí (index) rồi thì cứ chui thẳng vào đó mà gán lại giá trị mới
-    ratingProduct.ratings[alreadyRatingIndex].star = star;
+    ratingProduct.ratings[alreadyRatingIndex].star = Number(star);
     ratingProduct.ratings[alreadyRatingIndex].comment = comment;
-
-    await ratingProduct.save();
   } else {
     // TRƯỜNG HỢP 2: Lần đầu đánh giá -> THÊM MỚI
-    // Dùng push() để nhét 1 object mới toanh vào cuối mảng ratings
-    ratingProduct.ratings.push({ star, comment, postedBy: userId });
-
-    await ratingProduct.save();
+    ratingProduct.ratings.push({
+      star: Number(star),
+      comment,
+      postedBy: _id,
+    });
   }
 
+  // 4. TÍNH TOÁN LẠI ĐIỂM RATING TRUNG BÌNH (totalRatings)
+  const ratingCount = ratingProduct.ratings.length;
+  const sumRatings = ratingProduct.ratings.reduce(
+    (sum, el) => sum + el.star,
+    0,
+  );
+  ratingProduct.totalRatings =
+    Math.round((sumRatings / ratingCount) * 10) / 10;
+
+  await ratingProduct.save();
+
   return res.status(200).json({
-    status: true,
-    message:
-      "Rating successfully added or updated - Ghi nhận đánh giá thành công!",
+    success: true,
+    message: "Ghi nhận đánh giá thành công!",
   });
 });
 
