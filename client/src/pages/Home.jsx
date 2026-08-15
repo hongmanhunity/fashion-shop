@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkle } from '@phosphor-icons/react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import ProductCard from '../components/product/ProductCard';
 
 const Home = () => {
@@ -11,7 +11,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/product');
+        const response = await axiosInstance.get('/product');
         if (response.data && response.data.success) {
           setProducts(response.data.products.slice(0, 8)); // Hiển thị 8 sản phẩm
         }

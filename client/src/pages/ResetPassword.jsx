@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -17,7 +17,7 @@ const ResetPassword = () => {
     setMessage('');
     
     try {
-      const response = await axios.put(`http://localhost:3000/api/user/reset-password/${token}`, { password });
+      const response = await axiosInstance.put(`/user/reset-password/${token}`, { password });
       if (response.data && response.data.success) {
         setMessage('Đặt lại mật khẩu thành công! Bạn sẽ được chuyển hướng về trang đăng nhập...');
         setTimeout(() => {

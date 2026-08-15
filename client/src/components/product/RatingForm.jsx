@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import {
   Star,
   ChatCircleText,
@@ -21,9 +21,8 @@ const RatingForm = ({
 
   const handleSubmitRating = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("accessToken");
 
-    if (!token) {
+    if (!isLoggedIn) {
       setMessage({ type: "error", text: "Bạn cần đăng nhập để gửi đánh giá!" });
       return;
     }
@@ -40,19 +39,11 @@ const RatingForm = ({
     setMessage({ type: "", text: "" });
 
     try {
-      const response = await axios.put(
-        "http://localhost:3000/api/product/ratings",
-        {
-          pid: productId,
-          star: ratingStar,
-          comment: comment.trim(),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await axiosInstance.put("/product/ratings", {
+        pid: productId,
+        star: ratingStar,
+        comment: comment.trim(),
+      });
 
       if (response.data && response.data.success) {
         setMessage({

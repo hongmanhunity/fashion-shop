@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 import {
   ShoppingBag,
   User,
@@ -9,44 +9,18 @@ import {
 } from "@phosphor-icons/react";
 
 const Header = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
+  const { user, isLoggedIn, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const userStr = localStorage.getItem("userData");
-
-    if (token) {
-      setIsLoggedIn(true);
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          setUserName(`${user.firstname} ${user.lastname}`);
-        } catch (error) {
-          console.error("Lỗi khi đọc dữ liệu user", error);
-        }
-      }
-    }
-  }, []);
+  const userName = user ? `${user.firstname} ${user.lastname}` : "";
 
   const handleLogout = async () => {
     try {
-      // Gọi API Logout tới backend để xóa refreshToken trong DB và Cookie
-      await axios.post(
-        "http://localhost:3000/api/user/logout",
-        {},
-        { withCredentials: true }
-      );
+      await logout();
     } catch (error) {
-      console.error("Lỗi khi gọi API logout:", error);
+      console.error("Lỗi khi logout:", error);
     } finally {
-      // Xóa thông tin xác thực ở LocalStorage và reset state
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("userData");
-      setIsLoggedIn(false);
-      setUserName("");
       setShowDropdown(false);
       navigate("/login");
     }
@@ -98,12 +72,9 @@ const Header = () => {
           </button>
 
           {/* Nút Giỏ hàng */}
-          <button className="text-text-main hover:text-primary transition-colors flex items-center justify-center relative p-1">
+          <Link to="/cart" className="text-text-main hover:text-primary transition-colors flex items-center justify-center relative p-1">
             <ShoppingBag size={24} weight="regular" />
-            <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[10px] font-bold h-4 min-w-[16px] rounded-full flex items-center justify-center px-1">
-              2
-            </span>
-          </button>
+          </Link>
 
           {/* Cụm User */}
           <div className="flex items-center gap-2 ">

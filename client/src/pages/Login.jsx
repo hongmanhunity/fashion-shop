@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -20,15 +23,10 @@ const Login = () => {
     setError('');
     
     try {
-      const response = await axios.post(
-        'http://localhost:3000/api/user/login', 
-        formData,
-        { withCredentials: true }
-      );
+      const response = await axiosInstance.post('/user/login', formData);
       if (response.data && response.data.success) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('userData', JSON.stringify(response.data.userData))
-        window.location.href = '/';
+        login(response.data.userData, response.data.accessToken);
+        navigate('/');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Thông tin đăng nhập không chính xác.');

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     setMessage('');
     
     try {
-      const response = await axios.post('http://localhost:3000/api/user/forgotpassword', { email });
+      const response = await axiosInstance.post('/user/forgotpassword', { email });
       if (response.data && response.data.success) {
         setMessage('Một liên kết khôi phục mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư đến.');
       }
