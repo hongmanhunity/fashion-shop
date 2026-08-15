@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const app = express();
+app.set("query parser", "extended");
 const port = process.env.PORT || 3000;
 app.use(cors({
   origin: "http://localhost:5173",

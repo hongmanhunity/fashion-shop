@@ -10,7 +10,14 @@ var userSchema = new mongoose.Schema(
     mobile: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, default: "user" },
-    cart: { type: Array, default: [] },
+    cart: [
+      {
+        product: { type: mongoose.Types.ObjectId, ref: "Products" },
+        quantity: { type: Number, default: 1 },
+        color: { type: String },
+        price: { type: Number },
+      },
+    ],
     address: { type: String, default: "" },
     avatar: { 
       type: String, 
@@ -27,6 +34,11 @@ var userSchema = new mongoose.Schema(
     timestamps: true, // Tự động sinh ra 2 trường createdAt và updatedAt
   },
 );
+
+// ⚡ Indexes cho tối ưu hóa xác thực User
+userSchema.index({ refreshToken: 1 });
+userSchema.index({ passwordResetToken: 1, passwordResetExpires: 1 });
+
 // Hash password trước khi lưu
 userSchema.pre("save", async function () {
   // Nếu password không bị thay đổi thì bỏ qua

@@ -33,4 +33,19 @@ const productSchema = new mongoose.Schema(
   },
 );
 
+// 🔍 1. Text Index: Cho ô Tìm kiếm sản phẩm theo từ khóa (Full-Text Search)
+productSchema.index({ title: "text", description: "text", brand: "text" });
+
+// 🚀 2. Compound Index (Category + Price): Cho bộ lọc Danh mục & Khoảng giá (Chuẩn ESR)
+productSchema.index({ category: 1, price: 1 });
+
+// 🚀 3. Compound Index (Brand + Price): Cho bộ lọc Thương hiệu & Khoảng giá
+productSchema.index({ brand: 1, price: 1 });
+
+// ⚡ 4. Index Sắp xếp Sản phẩm mới nhất
+productSchema.index({ createdAt: -1 });
+
+// ⚡ 5. Index cho Danh sách Sản phẩm bán chạy & Đánh giá cao
+productSchema.index({ totalRatings: -1, sold: -1 });
+
 module.exports = mongoose.model("Products", productSchema);

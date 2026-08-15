@@ -36,15 +36,4 @@ const isAdmin = asyncHandler(async (req, res, next) => {
   next();
 });
 
-const isUser = asyncHandler(async (req, res, next) => {
-  const { _id, role } = req.user;
-  if (role !== "user") {
-    return res.status(401).json({
-      success: false,
-      mes: "JUST FOR USER - Quản trị viên thì miễn!",
-    });
-  }
-  next();
-});
-
-module.exports = { verifyAccessToken, isAdmin, isUser };
+module.exports = { verifyAccessToken, isAdmin };

@@ -10,12 +10,15 @@ const {
   deleteUser,
   updateUser,
   updateUserByAdmin,
+  updateCart,
+  getUserCart,
+  removeCartItem,
 } = require("../controllers/userController");
 const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
 const {
   validateRegister,
   validateLogin,
-} = require("../vadilation/AuthValidator");
+} = require("../validation/AuthValidator");
 const router = require("express").Router();
 
 // Endpoint: POST /api/user/register
@@ -25,6 +28,12 @@ router.post("/register", validateRegister, register);
 router.post("/login", validateLogin, login);
 router.get("/current", verifyAccessToken, getCurrent);
 router.put("/current", verifyAccessToken, updateUser);
+
+// 🛒 Routes Giỏ hàng (Cart)
+router.put("/cart", verifyAccessToken, updateCart);
+router.get("/cart", verifyAccessToken, getUserCart);
+router.delete("/cart/:pid", verifyAccessToken, removeCartItem);
+
 router.post("/refreshtoken", refreshAccessToken);
 router.post("/logout", logout);
 router.post("/forgotpassword", forgotPassword);
